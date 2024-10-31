@@ -1,11 +1,11 @@
 package Cruds;
 
 public class Cliente {
-    private int clienteId;
-    private String nome;
-    private String email;
-    private String telefone;
-    private java.sql.Date dataCadastro;
+    private int clienteId;                 // ID do cliente
+    private String nome;                    // Nome do cliente
+    private String email;                   // Email do cliente
+    private String telefone;                // Telefone do cliente
+    private java.sql.Date dataCadastro;     // Data do cadastro do cliente
 
     // Construtor
     public Cliente(int clienteId, String nome, String email, String telefone, java.sql.Date dataCadastro) {
@@ -16,7 +16,7 @@ public class Cliente {
         this.dataCadastro = dataCadastro;
     }
 
-    // Getters e Setters
+    // Métodos Getters e Setters para modificar os atributos
     public int getClienteId() { return clienteId; }
     public void setClienteId(int clienteId) { this.clienteId = clienteId; }
 
