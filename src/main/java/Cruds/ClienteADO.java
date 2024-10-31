@@ -1,15 +1,26 @@
 package Cruds;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class ClienteADO {
     private Connection connection;
 
-    // Construtor para abrir a conexão
-    public ClienteADO(String url, String usuario, String senha) throws SQLException {
-        this.connection = DriverManager.getConnection(url, usuario, senha);
+    // Construtor que lê as configurações do arquivo db.properties
+    public ClienteADO() throws SQLException, IOException {
+        Properties props = new Properties();
+        try (FileInputStream fis = new FileInputStream("db.properties")) {
+            props.load(fis);
+        }
+        String url = props.getProperty("db.url");
+        String user = props.getProperty("db.username");
+        String password = props.getProperty("db.password");
+        
+        this.connection = DriverManager.getConnection(url, user, password);
     }
 
     // Método para cadastrar um novo cliente
@@ -87,7 +98,7 @@ public class ClienteADO {
 
     // Método para fechar a conexão
     public void fecharConexao() throws SQLException {
-        if (connection != null) {
+        if (connection != null && !connection.isClosed()) {
             connection.close();
         }
     }

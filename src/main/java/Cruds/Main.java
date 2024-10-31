@@ -1,18 +1,15 @@
-    package Cruds;
+package Cruds;
 
 import java.sql.Date;
 import java.util.List;
 import java.util.Scanner;
 
-public class Principal {
+public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String url = "jdbc:mysql://localhost:3306/E_commerce"; // Ajuste conforme sua configuração
-        String usuario = "seu_usuario";
-        String senha = "sua_senha";
 
         try {
-            ClienteADO clienteADO = new ClienteADO(url, usuario, senha);
+            ClienteADO clienteADO = new ClienteADO();
             while (true) {
                 System.out.println("1. Cadastrar Cliente");
                 System.out.println("2. Listar Clientes");
@@ -64,6 +61,7 @@ public class Principal {
                         // Atualizar Cliente
                         System.out.print("ID do Cliente: ");
                         int atualizarId = scanner.nextInt();
+                        scanner.nextLine(); // Limpa o buffer
                         Cliente clienteAtualizar = clienteADO.buscarCliente(atualizarId);
                         if (clienteAtualizar != null) {
                             System.out.print("Novo Nome: ");
@@ -97,7 +95,7 @@ public class Principal {
                         System.out.println("Opção inválida!");
                 }
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             scanner.close();
