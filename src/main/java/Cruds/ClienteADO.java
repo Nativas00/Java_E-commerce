@@ -1,6 +1,6 @@
 package Cruds;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,11 +14,15 @@ public class ClienteADO {
     public ClienteADO() throws SQLException, IOException {
         Properties props = new Properties();
         
-        // Carrega as propriedades do arquivo db.properties
-        try (FileInputStream fis = new FileInputStream("db.properties")) {
-            props.load(fis);
+        // Carrega as propriedades do arquivo db.properties usando ClassLoader
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties")) {
+            if (input == null) {
+                System.out.println("Desculpe, o arquivo db.properties não foi encontrado");
+                return;
+            }
+            props.load(input);
         }
-        
+
         // Extrai as propriedades do arquivo
         String url = props.getProperty("db.url");         // URL do banco de dados
         String user = props.getProperty("db.username");   // Nome de usuário para login no banco

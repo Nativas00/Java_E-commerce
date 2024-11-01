@@ -16,12 +16,14 @@ public class Main {
             // Loop principal do programa para apresentar o menu e executar operações
             while (true) {
                 // Exibe o menu de opções para o usuário
+                System.out.println("\n--- Menu Principal ---");
                 System.out.println("1. Cadastrar Cliente");
                 System.out.println("2. Listar Clientes");
                 System.out.println("3. Buscar Cliente");
                 System.out.println("4. Atualizar Cliente");
                 System.out.println("5. Excluir Cliente");
-                System.out.println("0. Sair");
+                System.out.println("0. Sair\n");
+                System.out.print("Escolha uma opcao: ");
                 
                 // Captura a opção escolhida pelo usuário
                 int opcao = scanner.nextInt();
