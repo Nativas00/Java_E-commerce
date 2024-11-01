@@ -34,18 +34,23 @@ public class ClienteADO {
 
     // Método para cadastrar um novo cliente no banco de dados
     public void cadastrarCliente(Cliente cliente) throws SQLException {
-        String sql = "INSERT INTO Clientes (Cliente_ID, Nome, Email, Telefone, Data_Cadastro) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Clientes (Nome, Email, Telefone, Data_Cadastro) VALUES (?, ?, ?, ?)";
         
         // Usa PreparedStatement para evitar SQL Injection e enviar os dados ao banco de forma segura
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, cliente.getClienteId());      // Define o valor do ID do cliente
-            stmt.setString(2, cliente.getNome());        // Define o nome do cliente
-            stmt.setString(3, cliente.getEmail());       // Define o email do cliente
-            stmt.setString(4, cliente.getTelefone());    // Define o telefone do cliente
-            stmt.setDate(5, cliente.getDataCadastro());  // Define a data de cadastro do cliente
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, cliente.getNome());        // Define o nome do cliente
+            stmt.setString(2, cliente.getEmail());       // Define o email do cliente
+            stmt.setString(3, cliente.getTelefone());    // Define o telefone do cliente
+            stmt.setDate(4, cliente.getDataCadastro());  // Define a data de cadastro do cliente
             
             // Executa a inserção no banco
             stmt.executeUpdate();
+            
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    cliente.setClienteId(generatedKeys.getInt(1));
+                }
+            }
         }
     }
 
