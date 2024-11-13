@@ -4,7 +4,16 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Classe principal com a interface de linha de comando para gerenciar operações com Clientes.
+ */
 public class Main {
+    /**
+     * Método principal que executa o programa de gerenciamento de clientes.
+     * Apresenta um menu de opções ao usuário para criar, listar, buscar, atualizar e excluir clientes.
+     *
+     * @param args argumentos de linha de comando (não utilizados)
+     */
     public static void main(String[] args) {
         // Cria um objeto Scanner para capturar a entrada do usuário no console
         Scanner scanner = new Scanner(System.in);
@@ -12,7 +21,7 @@ public class Main {
         try {
             // Instancia o ClienteADO, responsável por gerenciar a interação com o banco de dados
             ClienteADO clienteADO = new ClienteADO();
-            
+
             // Loop principal do programa para apresentar o menu e executar operações
             while (true) {
                 // Exibe o menu de opções para o usuário
@@ -24,11 +33,11 @@ public class Main {
                 System.out.println("5. Excluir Cliente");
                 System.out.println("0. Sair\n");
                 System.out.print("Escolha uma opcao: ");
-                
+
                 // Captura a opção escolhida pelo usuário
                 int opcao = scanner.nextInt();
                 scanner.nextLine(); // Limpa o buffer do scanner após capturar um número
-                
+
                 // Executa a operação com base na opção selecionada
                 switch (opcao) {
                     case 1 -> {
@@ -39,20 +48,15 @@ public class Main {
                         String email = scanner.nextLine();
                         System.out.print("Telefone: ");
                         String telefone = scanner.nextLine();
-                        
-                        // Cria um novo objeto Cliente com os dados capturados
+
                         Cliente novoCliente = new Cliente(0, nome, email, telefone, new Date(System.currentTimeMillis()));
-                        
-                        // Usa ClienteADO para inserir o novo cliente no banco de dados
                         clienteADO.cadastrarCliente(novoCliente);
                         System.out.println("Cliente cadastrado com sucesso!");
                     }
 
-                    case 2 -> {
                         // Caso "2", lista todos os clientes cadastrados
-                        List<Cliente> clientes = clienteADO.listarClientes(); // Obtem lista de clientes
-                        
-                        // Exibe as informações de cada cliente no console
+                    case 2 -> {
+                        List<Cliente> clientes = clienteADO.listarClientes();
                         for (Cliente cliente : clientes) {
                             System.out.println(cliente.getClienteId() + " | " + cliente.getNome() + " | " + cliente.getEmail() + " | " + cliente.getTelefone());
                         }
@@ -62,11 +66,7 @@ public class Main {
                         // Caso "3", busca um cliente pelo ID fornecido pelo usuário
                         System.out.print("ID do Cliente: ");
                         int buscarId = scanner.nextInt();
-                        
-                        // Chama o método buscarCliente de ClienteADO para localizar o cliente
                         Cliente cliente = clienteADO.buscarCliente(buscarId);
-                        
-                        // Exibe o resultado da busca
                         if (cliente != null) {
                             System.out.println("Cliente encontrado: " + cliente.getNome());
                         } else {
@@ -78,12 +78,9 @@ public class Main {
                         // Caso "4", permite atualizar as informações de um cliente existente
                         System.out.print("ID do Cliente: ");
                         int atualizarId = scanner.nextInt();
-                        scanner.nextLine(); // Limpa o buffer do scanner
-                        
-                        // Busca o cliente pelo ID
+                        scanner.nextLine(); 
+
                         Cliente clienteAtualizar = clienteADO.buscarCliente(atualizarId);
-                        
-                        // Se o cliente for encontrado, solicita novos dados para atualização
                         if (clienteAtualizar != null) {
                             System.out.print("Novo Nome: ");
                             clienteAtualizar.setNome(scanner.nextLine());
@@ -91,8 +88,6 @@ public class Main {
                             clienteAtualizar.setEmail(scanner.nextLine());
                             System.out.print("Novo Telefone: ");
                             clienteAtualizar.setTelefone(scanner.nextLine());
-                            
-                            // Atualiza o cliente no banco de dados
                             clienteADO.atualizarCliente(clienteAtualizar);
                             System.out.println("Cliente atualizado com sucesso!");
                         } else {
@@ -114,17 +109,14 @@ public class Main {
                         // Caso "0", fecha a conexão com o banco e encerra o programa
                         clienteADO.fecharConexao();
                         System.out.println("Saindo...");
-                        return; // Sai do loop e encerra o método main
+                        return;
                     }
-                    default -> // Caso o usuário insira uma opção inválida
-                        System.out.println("Opção inválida!");
+                    default -> System.out.println("Opção inválida!");
                 }
             }
         } catch (Exception e) {
-            // Captura e exibe qualquer exceção que ocorrer durante a execução do programa
             e.printStackTrace();
         } finally {
-            // Garante que o scanner será fechado após o término do programa
             scanner.close();
         }
     }

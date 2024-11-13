@@ -7,10 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+/**
+ * Classe responsável pelas operações de acesso aos dados (ADO) para a entidade Cliente.
+ * Gerencia a conexão com o banco de dados e realiza operações CRUD (Create, Read, Update, Delete).
+ */
 public class ClienteADO {
-    private Connection connection;  // Objeto de conexão para gerenciar a conexão com o banco de dados
+    private Connection connection;
 
-    // Construtor que inicializa a conexão com o banco de dados
+    /**
+     * Construtor que inicializa a conexão com o banco de dados a partir do arquivo de propriedades.
+     *
+     * @throws SQLException se ocorrer um erro de SQL
+     * @throws IOException se ocorrer um erro de I/O ao ler o arquivo de propriedades
+     */
     public ClienteADO() throws SQLException, IOException {
         Properties props = new Properties();
         
@@ -23,27 +32,28 @@ public class ClienteADO {
             props.load(input);
         }
 
-        // Extrai as propriedades do arquivo
-        String url = props.getProperty("db.url");         // URL do banco de dados
-        String user = props.getProperty("db.username");   // Nome de usuário para login no banco
-        String password = props.getProperty("db.password"); // Senha para login no banco
+        String url = props.getProperty("db.url");
+        String user = props.getProperty("db.username");
+        String password = props.getProperty("db.password");
 
-        // Cria a conexão com o banco usando as propriedades extraídas
         this.connection = DriverManager.getConnection(url, user, password);
     }
 
-    // Método para cadastrar um novo cliente no banco de dados
+    /**
+     * Cadastra um novo cliente no banco de dados.
+     *
+     * @param cliente o objeto Cliente a ser cadastrado
+     * @throws SQLException se ocorrer um erro de SQL
+     */
     public void cadastrarCliente(Cliente cliente) throws SQLException {
         String sql = "INSERT INTO Clientes (Nome, Email, Telefone, Data_Cadastro) VALUES (?, ?, ?, ?)";
         
-        // Usa PreparedStatement para evitar SQL Injection e enviar os dados ao banco de forma segura
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, cliente.getNome());        // Define o nome do cliente
-            stmt.setString(2, cliente.getEmail());       // Define o email do cliente
-            stmt.setString(3, cliente.getTelefone());    // Define o telefone do cliente
-            stmt.setDate(4, cliente.getDataCadastro());  // Define a data de cadastro do cliente
+            stmt.setString(1, cliente.getNome());
+            stmt.setString(2, cliente.getEmail());
+            stmt.setString(3, cliente.getTelefone());
+            stmt.setDate(4, cliente.getDataCadastro());
             
-            // Executa a inserção no banco
             stmt.executeUpdate();
             
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
@@ -54,24 +64,27 @@ public class ClienteADO {
         }
     }
 
-    // Método para listar todos os clientes do banco de dados
+    /**
+     * Retorna uma lista de todos os clientes cadastrados no banco de dados.
+     *
+     * @return uma lista de objetos Cliente
+     * @throws SQLException se ocorrer um erro de SQL
+     */
     public List<Cliente> listarClientes() throws SQLException {
-        List<Cliente> clientes = new ArrayList<>();  // Lista que armazenará os clientes recuperados
-        String sql = "SELECT * FROM Clientes";      
+        List<Cliente> clientes = new ArrayList<>();
+        String sql = "SELECT * FROM Clientes";
         
-        // Usa Statement para executar o comando SQL
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             
-            // Loop para iterar por cada cliente
             while (rs.next()) {
                 // Cria um novo objeto Cliente com os dados do ResultSet
                 Cliente cliente = new Cliente(
-                    rs.getInt("Cliente_ID"),       // ID do cliente
-                    rs.getString("Nome"),          // Nome do cliente
-                    rs.getString("Email"),         // Email do cliente
-                    rs.getString("Telefone"),      // Telefone do cliente
-                    rs.getDate("Data_Cadastro")    // Data de cadastro do cliente
+                    rs.getInt("Cliente_ID"),
+                    rs.getString("Nome"),
+                    rs.getString("Email"),
+                    rs.getString("Telefone"),
+                    rs.getDate("Data_Cadastro")
                 );
                 
                 // Adiciona o cliente à lista de clientes
@@ -82,18 +95,21 @@ public class ClienteADO {
         return clientes;
     }
 
-    // Método para buscar um cliente específico pelo seu ID
+    /**
+     * Busca um cliente específico pelo seu ID.
+     *
+     * @param clienteId o ID do cliente a ser buscado
+     * @return o objeto Cliente correspondente ou null se não encontrado
+     * @throws SQLException se ocorrer um erro de SQL
+     */
     public Cliente buscarCliente(int clienteId) throws SQLException {
-        String sql = "SELECT * FROM Clientes WHERE Cliente_ID = ?"; // Comando SQL para buscar cliente por ID
+        String sql = "SELECT * FROM Clientes WHERE Cliente_ID = ?";
         
-        // Usa PreparedStatement para garantir segurança e flexibilidade
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, clienteId); // Define o valor do parâmetro para o ID do cliente
+            stmt.setInt(1, clienteId);
             ResultSet rs = stmt.executeQuery();
             
-            // Verifica se a consulta retornou algum resultado
             if (rs.next()) {
-                // Retorna o cliente
                 return new Cliente(
                     rs.getInt("Cliente_ID"),
                     rs.getString("Nome"),
@@ -108,36 +124,46 @@ public class ClienteADO {
         return null;
     }
 
-    // Método para atualizar as informações de um cliente específico
+    /**
+     * Atualiza as informações de um cliente específico.
+     *
+     * @param cliente o objeto Cliente com as novas informações
+     * @throws SQLException se ocorrer um erro de SQL
+     */
     public void atualizarCliente(Cliente cliente) throws SQLException {
         String sql = "UPDATE Clientes SET Nome = ?, Email = ?, Telefone = ? WHERE Cliente_ID = ?";
         
-        // Usa PreparedStatement para atualizar o cliente com segurança
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, cliente.getNome());        // Define o novo nome do cliente
-            stmt.setString(2, cliente.getEmail());       // Define o novo email do cliente
-            stmt.setString(3, cliente.getTelefone());    // Define o novo telefone do cliente
-            stmt.setInt(4, cliente.getClienteId());      // Define o novo ID do cliente
+            stmt.setString(1, cliente.getNome());
+            stmt.setString(2, cliente.getEmail());
+            stmt.setString(3, cliente.getTelefone());
+            stmt.setInt(4, cliente.getClienteId());
             
-            // Executa a atualização no banco
             stmt.executeUpdate();
         }
     }
 
-    // Método para excluir um cliente do banco de dados pelo ID
+    /**
+     * Exclui um cliente do banco de dados pelo ID.
+     *
+     * @param clienteId o ID do cliente a ser excluído
+     * @throws SQLException se ocorrer um erro de SQL
+     */
     public void excluirCliente(int clienteId) throws SQLException {
-        String sql = "DELETE FROM Clientes WHERE Cliente_ID = ?"; // Comando SQL para exclusão de cliente
+        String sql = "DELETE FROM Clientes WHERE Cliente_ID = ?";
         
-        // Usa PreparedStatement para excluir o cliente de forma segura
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, clienteId);  // Define o ID do cliente a ser excluído
+            stmt.setInt(1, clienteId);
             
-            // Executa a exclusão no banco
             stmt.executeUpdate();
         }
     }
 
-    // Método para fechar a conexão com o banco de dados
+    /**
+     * Fecha a conexão com o banco de dados.
+     *
+     * @throws SQLException se ocorrer um erro ao fechar a conexão
+     */
     public void fecharConexao() throws SQLException {
         if (connection != null && !connection.isClosed()) {
             connection.close();
